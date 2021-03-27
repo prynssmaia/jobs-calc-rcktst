@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="20%" src="images\icon_calc.png">
+    <img width="20%" src="public\images\icon_calc.png">
 </p>
 <h1 align="center">JobsCalc - Rocketseat</h1>
 <p align="center">
@@ -59,6 +59,9 @@ npm init -y
 
 --Instalar Express
 npm i exprees
+
+--Rodar nodemon em ambiente de desenvolvimento
+npm run dev
 
 --Subir servidor node
 node src/server.js
