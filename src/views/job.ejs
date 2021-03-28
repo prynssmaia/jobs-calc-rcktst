@@ -24,14 +24,10 @@
     
   </head>
   <body id="page-job">
-    <header class="page-header inner">
-      <div class="container animate-up">
-        <a href="/" class="back">
-          <img src="/images/back.svg" alt="" />
-        </a>
-        <h1>Adicionar Novo Job</h1>
-      </div>
-    </header>
+    <!-- // Utilizando o ejs para reutilizar  a página de Adicionar Novo Job
+    // É necessário criar o diretório parts com a arquivo page-header,
+    // onde esse arquivo possuíra o html reaproveitado nas demais páginas. -->
+    <%- include('parts/page-header', { title: 'Adicionar Novo Job'}) %> 
 
     <div class="container flex animate-up delay-2">
       <main>
