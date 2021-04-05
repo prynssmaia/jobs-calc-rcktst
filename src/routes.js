@@ -19,9 +19,7 @@ const profile = {
     "vacation-per-year": 4
 }
 // Controle de Jobs
-const jobs = [
-    {}
-]
+const jobs = []
 
 
 // Funções que direcionam para as páginas
@@ -35,7 +33,13 @@ routes.get('/profile', (req, res) => res.render(views + "profile", {profile: pro
 
 // Métodos POST
 routes.post('/job', (req, res) => {
-    console.log(req.body)
+    // Empurra a requisição do body para o arra jobs
+    // ou seja req.body = { name: 'nome', 'daily-hours': 'numero', 'total-hours': 'numero' }
+ 
+    jobs.push(req.body)
+
+    // Retorna para a página inicial após salvar dados no array
+    return res.redirect('/')
 })
 
 
