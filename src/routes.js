@@ -12,20 +12,32 @@ const views = __dirname + "/views/"
 
 const profile = {
     name: "Prynss",
-    avatar: "https://avatars.githubusercontent.com/u/71911907?v=4",
+    avatar: "https://github.com/prynssmaia.png",
     "monthly-budget": 3000,
     "days-per-week": 5,
     "hours-per-day": 5,
     "vacation-per-year": 4
 }
+// Controle de Jobs
+const jobs = [
+    {}
+]
 
 
 // Funções que direcionam para as páginas
 // Req - Request, Res - Response
+
+// Métodos GET
 routes.get('/', (req, res) => res.render(views + "index"))
 routes.get('/job', (req, res) => res.render(views + "job"))
 routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
 routes.get('/profile', (req, res) => res.render(views + "profile", {profile: profile}))
+
+// Métodos POST
+routes.post('/job', (req, res) => {
+    console.log(req.body)
+})
+
 
 // Exportando a função rotas
 module.exports = routes;

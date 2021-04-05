@@ -55,7 +55,8 @@ Você pode visualizar o layout do projeto através [desse link](https://www.figm
 
 ```bash
 --Iniciar projeto
-npm init -y
+para baixar as dependências quando não houver node_modules
+npm install
 
 --Instalar Express
 npm i exprees

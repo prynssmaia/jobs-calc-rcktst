@@ -11,9 +11,12 @@ server.set('view engine', 'ejs')
 // que habilita os arquivos estáticos, do ditório public
 server.use(express.static("public"))
 
+// Habilita o req.body nas rotas
+server.use(express.urlencoded({ extended: true }))
+
 // Rotas
 server.use(routes)
 
 // Server está utilizando a funcionalidade listen
 // que sobe o servidor na porta desejada
-server.listen(3001, () => console.log('Rodando em localhost 3001'))
+server.listen(3001, () => console.log('Rodando em http://localhost:3001'))
