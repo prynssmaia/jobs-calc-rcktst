@@ -50,7 +50,7 @@ routes.post('/job', (req, res) => {
     // Função conta a quantidade de elementos do array
     // E subtrai 1, assim é atribuído ao número de id
     // Se não houver elementos no array, será atríbuido 1
-    const lastId = jobs[jobs.length - 1]?.id || 1;
+    const lastId = jobs[jobs.length - 1] ? jobs[jobs.length - 1].id : 1;
    
     jobs.push({
         id: lastId + 1,
