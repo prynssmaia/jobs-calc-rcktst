@@ -19,28 +19,53 @@ const profile = {
     "vacation-per-year": 4
 }
 // Controle de Jobs
-const jobs = []
+const jobs = [ 
+    {
+      id: 1,
+      name: "Pizzaria Guloso",
+      "daily-hours": 2, 
+      "total-hours": 1, 
+      created_at: Date.now()
+    },
+    {
+      id: 2,
+      name: "OneTwo Project",
+      "daily-hours": 3, 
+      "total-hours": 47, 
+      created_at: Date.now()
+    }];
 
 
 // Funções que direcionam para as páginas
 // Req - Request, Res - Response
 
 // Métodos GET
-routes.get('/', (req, res) => res.render(views + "index"))
+routes.get('/',(req, res) => res.render(views + "index",{ jobs }));
 routes.get('/job', (req, res) => res.render(views + "job"))
-routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
-routes.get('/profile', (req, res) => res.render(views + "profile", {profile: profile}))
-
-// Métodos POST
+// Método POST
 routes.post('/job', (req, res) => {
     // Empurra a requisição do body para o arra jobs
     // ou seja req.body = { name: 'nome', 'daily-hours': 'numero', 'total-hours': 'numero' }
- 
-    jobs.push(req.body)
+
+    // Função conta a quantidade de elementos do array
+    // E subtrai 1, assim é atribuído ao número de id
+    // Se não houver elementos no array, será atríbuido 1
+    const lastId = jobs[jobs.length - 1]?.id || 1;
+   
+    jobs.push({
+        id: lastId + 1,
+        name: req.body.name,
+        "daily-hours": req.body["daily-hours"],
+        "total-hours": req.body["total-hours"],
+        created_at: Date.now()        
+    })
 
     // Retorna para a página inicial após salvar dados no array
     return res.redirect('/')
-})
+});
+routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
+routes.get('/profile', (req, res) => res.render(views + "profile", {profile: profile}))
+
 
 
 // Exportando a função rotas
