@@ -16,7 +16,8 @@ const profile = {
     "monthly-budget": 3000,
     "days-per-week": 5,
     "hours-per-day": 5,
-    "vacation-per-year": 4
+    "vacation-per-year": 4,
+    "value-hour": 75
 }
 // Controle de Jobs
 const jobs = [ 
@@ -35,45 +36,60 @@ const jobs = [
       created_at: Date.now()
     }];
 
+function remainingDay(jov) {
+  // Calculo de tempo restante
+  const remainingDays = job['total-hours'] / job['daily-hours'].toFixed()
+    
+  // Constante Data de criação do projeto
+  const createdDate = new Date(job.created_at)
+
+  // Constante Dia de vencimento é resultante da soma do dia de criação do projeto
+  // mais o número de dias remescentes
+  const dueDay = createdDate.getDate() + Number(remainingDays)
+
+  // Constate com a Data exata do dia de vencimento.
+  const dueDateInMs = createdDate.setDate(dueDay)
+
+  // Constante Diferença de Tempo em Milesegundos é o resultado
+  // da subtração da data de vencimento menos o dia de hoje.
+  const timeDiffInMs = dueDateInMs - Date.now()
+
+  // Transforma milisegundos em dias
+  const dayInMs = 1000 * 60 * 60 * 24
+
+  // Constante Diferenã de Dias é o produto da divsão
+  // entre Difença de Tempo em Millisegundos divido pelo Dia em Millisegundos
+  const dayDiff = (timeDiffInMs / dayInMs).toFixed()
+
+  // Restam x dias para o fim do projeto
+  return dayDiff
+}
+
 
 // Funções que direcionam para as páginas
 // Req - Request, Res - Response
-
 // Métodos GET
 routes.get('/',(req, res) => {
   const updatedJobs = jobs.map((job) => {
     // Ajustes no job
-    // Calculo de tempo restante
-    const remainingDays = job['total-hours'] / job['daily-hours'].toFixed()
     
-    // Constante Data de criação do projeto
-    const createdDate = new Date(job.created_at)
+    const remaining = remainingDay(job)
+    const status = remaining <= 0 ? 'done' : 'progress'
 
-    // Constante Dia de vencimento é resultante da soma do dia de criação do projeto
-    // mais o número de dias remescentes
-    const dueDay = createdDate.getDate() + Number(remainingDays)
-
-    // Constate com a Data exata do dia de vencimento.
-    const dueDateInMs = createdDate.setDate(dueDay)
-
-    // Constante Diferença de Tempo em Milesegundos é o resultado
-    // da subtração da data de vencimento menos o dia de hoje.
-    const timeDiffInMs = dueDateInMs - Date.now()
-
-    // Transforma milisegundos em dias
-    const dayInMs = 1000 * 60 * 60 * 24
-
-    // Constante Diferenã de Dias é o produto da divsão
-    // entre Difença de Tempo em Millisegundos divido pelo Dia em Millisegundos
-    const dayDiff = (timeDiffInMs / dayInMs).toFixed()
-
-    return job
+    return {
+      ...job,
+      remaining,
+      status,
+      budget: profile["value-hour"] * job["total-hours"]
+    }
   })
 
 
   // Retorna a página index
-  return res.render(views + "index",{ jobs })
+  return res.render(views + "index",{ jobs: updatedJobs })
 });
+
+
 routes.get('/job', (req, res) => res.render(views + "job"))
 // Método POST
 routes.post('/job', (req, res) => {

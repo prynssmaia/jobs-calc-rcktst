@@ -32,7 +32,7 @@ Projeto desenvolvido durante a Maratona Discover oferecida pela Rocketseat, dura
 
 Status | Aula |  Assunto
 :---: | :---: | :---:
-:x: | [2:29:10](https://youtu.be/tiveAxWqjeU?t=8950) | Novas peãs para o motor.
+:x: | [2:48:31](https://youtu.be/tiveAxWqjeU?t=10111) | Novas peãs para o motor.
 
 ---
 
