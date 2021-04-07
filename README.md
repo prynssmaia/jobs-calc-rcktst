@@ -32,7 +32,7 @@ Projeto desenvolvido durante a Maratona Discover oferecida pela Rocketseat, dura
 
 Status | Aula |  Assunto
 :---: | :---: | :---:
-:x: | [3:00:55](https://youtu.be/-ZKQEhmZB1U?t=10855) | Construindo o motor da nave.
+:x: | [2:29:10](https://youtu.be/tiveAxWqjeU?t=8950) | Novas peãs para o motor.
 
 ---
 

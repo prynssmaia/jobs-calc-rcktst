@@ -29,7 +29,7 @@ const jobs = [
     },
     {
       id: 2,
-      name: "OneTwo Project",
+      name: "313 Project",
       "daily-hours": 3, 
       "total-hours": 47, 
       created_at: Date.now()
@@ -40,7 +40,40 @@ const jobs = [
 // Req - Request, Res - Response
 
 // Métodos GET
-routes.get('/',(req, res) => res.render(views + "index",{ jobs }));
+routes.get('/',(req, res) => {
+  const updatedJobs = jobs.map((job) => {
+    // Ajustes no job
+    // Calculo de tempo restante
+    const remainingDays = job['total-hours'] / job['daily-hours'].toFixed()
+    
+    // Constante Data de criação do projeto
+    const createdDate = new Date(job.created_at)
+
+    // Constante Dia de vencimento é resultante da soma do dia de criação do projeto
+    // mais o número de dias remescentes
+    const dueDay = createdDate.getDate() + Number(remainingDays)
+
+    // Constate com a Data exata do dia de vencimento.
+    const dueDateInMs = createdDate.setDate(dueDay)
+
+    // Constante Diferença de Tempo em Milesegundos é o resultado
+    // da subtração da data de vencimento menos o dia de hoje.
+    const timeDiffInMs = dueDateInMs - Date.now()
+
+    // Transforma milisegundos em dias
+    const dayInMs = 1000 * 60 * 60 * 24
+
+    // Constante Diferenã de Dias é o produto da divsão
+    // entre Difença de Tempo em Millisegundos divido pelo Dia em Millisegundos
+    const dayDiff = (timeDiffInMs / dayInMs).toFixed()
+
+    return job
+  })
+
+
+  // Retorna a página index
+  return res.render(views + "index",{ jobs })
+});
 routes.get('/job', (req, res) => res.render(views + "job"))
 // Método POST
 routes.post('/job', (req, res) => {
