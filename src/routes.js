@@ -10,17 +10,59 @@ const routes = express.Router();
 
 const views = __dirname + "/views/"
 
-const profile = {
-    name: "Prynss",
-    avatar: "https://github.com/prynssmaia.png",
-    "monthly-budget": 3000,
-    "days-per-week": 5,
-    "hours-per-day": 5,
-    "vacation-per-year": 4,
-    "value-hour": 75
+const Profile = {
+    data: {
+      name: "Prynss",
+      avatar: "https://github.com/prynssmaia.png",
+      "monthly-budget": 3000,
+      "days-per-week": 5,
+      "hours-per-day": 5,
+      "vacation-per-year": 4,
+      "value-hour": 75,
+    },
+    
+    controllers: {
+      index(req, res) {
+        return res.render(views + "profile", { profile: Profile.data })
+      },
+  
+      update(req, res) {
+        // req.body para pegar os dados
+        const data = req.body
+  
+        // definir quantas semanas tem num ano: 52
+        const weeksPerYear = 52
+  
+        // remover as semanas de férias do ano, para pegar quantas semanas tem em 1 mês
+        const weeksPerMonth = (weeksPerYear - data["vacation-per-year"] ) / 12
+        
+        // total de horas trabalhadas na semana
+        const weekTotalHours  = data["hours-per-day"] * data["days-per-week"]
+  
+        // horas trabalhadas no mês
+        const monthlyTotalHours = weekTotalHours * weeksPerMonth
+  
+        // qual será o valor da minha hora?
+        const valueHour = data["monthly-budget"] / monthlyTotalHours
+  
+        Profile.update({
+          ...Profile.data,
+          ...req.body,
+          "value-hour": valueHour
+        })
+  
+        return res.redirect('/profile')
+      }
+    },
+
 }
-// Controle de Jobs
-const jobs = [ 
+
+// Refatorado
+// Função controllers criada dentro do objeto Job 
+// Services com as funções auxiliares
+// Data é o controle dos dados
+const Job = {
+  data: [ 
     {
       id: 1,
       name: "Pizzaria Guloso",
@@ -34,74 +76,42 @@ const jobs = [
       "daily-hours": 3, 
       "total-hours": 47, 
       created_at: Date.now()
-    }];
+    }],
 
-function remainingDay(jov) {
-  // Calculo de tempo restante
-  const remainingDays = job['total-hours'] / job['daily-hours'].toFixed()
-    
-  // Constante Data de criação do projeto
-  const createdDate = new Date(job.created_at)
+  controllers: {
+    index(req, res){
+        const updatedJobs = Job.data.map((job) => {
+          // Ajustes no job
+          
+          const remaining = Job.services.remainingDays(job)
+          const status = remaining <= 0 ? 'done' : 'progress'
+      
+          return {
+            ...job,
+            remaining,
+            status,
+            budget: Profile.data["value-hour"] * job["total-hours"]
+          }
+        })      
+      
+        // Retorna a página index
+        return res.render(views + "index",{ jobs: updatedJobs })
+    },
 
-  // Constante Dia de vencimento é resultante da soma do dia de criação do projeto
-  // mais o número de dias remescentes
-  const dueDay = createdDate.getDate() + Number(remainingDays)
+    create(req, res){
+      return res.render(views + "job")
+    },
 
-  // Constate com a Data exata do dia de vencimento.
-  const dueDateInMs = createdDate.setDate(dueDay)
-
-  // Constante Diferença de Tempo em Milesegundos é o resultado
-  // da subtração da data de vencimento menos o dia de hoje.
-  const timeDiffInMs = dueDateInMs - Date.now()
-
-  // Transforma milisegundos em dias
-  const dayInMs = 1000 * 60 * 60 * 24
-
-  // Constante Diferenã de Dias é o produto da divsão
-  // entre Difença de Tempo em Millisegundos divido pelo Dia em Millisegundos
-  const dayDiff = (timeDiffInMs / dayInMs).toFixed()
-
-  // Restam x dias para o fim do projeto
-  return dayDiff
-}
-
-
-// Funções que direcionam para as páginas
-// Req - Request, Res - Response
-// Métodos GET
-routes.get('/',(req, res) => {
-  const updatedJobs = jobs.map((job) => {
-    // Ajustes no job
-    
-    const remaining = remainingDay(job)
-    const status = remaining <= 0 ? 'done' : 'progress'
-
-    return {
-      ...job,
-      remaining,
-      status,
-      budget: profile["value-hour"] * job["total-hours"]
-    }
-  })
-
-
-  // Retorna a página index
-  return res.render(views + "index",{ jobs: updatedJobs })
-});
-
-
-routes.get('/job', (req, res) => res.render(views + "job"))
-// Método POST
-routes.post('/job', (req, res) => {
-    // Empurra a requisição do body para o arra jobs
+    save(req, res){
+    // Empurra a requisição do body para o array jobs
     // ou seja req.body = { name: 'nome', 'daily-hours': 'numero', 'total-hours': 'numero' }
 
     // Função conta a quantidade de elementos do array
     // E subtrai 1, assim é atribuído ao número de id
     // Se não houver elementos no array, será atríbuido 1
-    const lastId = jobs[jobs.length - 1] ? jobs[jobs.length - 1].id : 1;
+    const lastId = Job.data[Job.data.length - 1] ? Job.data[Job.data.length - 1].id : 1;
    
-    jobs.push({
+    Job.data.push({
         id: lastId + 1,
         name: req.body.name,
         "daily-hours": req.body["daily-hours"],
@@ -111,10 +121,54 @@ routes.post('/job', (req, res) => {
 
     // Retorna para a página inicial após salvar dados no array
     return res.redirect('/')
-});
-routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
-routes.get('/profile', (req, res) => res.render(views + "profile", {profile: profile}))
+    }
+  },
 
+  services: {
+    remainingDays(job) {
+      // Calculo de tempo restante
+      const remainingDays = (job['total-hours'] / job['daily-hours']).toFixed()
+        
+      // Constante Data de criação do projeto
+      const createdDate = new Date(job.created_at)
+    
+      // Constante Dia de vencimento é resultante da soma do dia de criação do projeto
+      // mais o número de dias remescentes
+      const dueDay = createdDate.getDate() + Number(remainingDays)
+    
+      // Constate com a Data exata do dia de vencimento.
+      const dueDateInMs = createdDate.setDate(dueDay)
+    
+      // Constante Diferença de Tempo em Milesegundos é o resultado
+      // da subtração da data de vencimento menos o dia de hoje.
+      const timeDiffInMs = dueDateInMs - Date.now()
+    
+      // Transforma milisegundos em dias
+      const dayInMs = 1000 * 60 * 60 * 24
+    
+      // Constante Diferenã de Dias é o produto da divsão
+      // entre Difença de Tempo em Millisegundos divido pelo Dia em Millisegundos
+      const dayDiff = (timeDiffInMs / dayInMs).toFixed()
+    
+      // Restam x dias para o fim do projeto
+      return dayDiff
+    }
+  }
+}
+
+
+// Funções que direcionam para as páginas
+// Req - Request, Res - Response
+// Métodos GET
+routes.get('/', Job.controllers.index);
+routes.get('/job', Job.controllers.create)
+routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
+routes.get('/profile', Profile.controllers.index)
+routes.post('/profile', Profile.controllers.index)
+
+// Método POST
+routes.post('/job', Job.controllers.save)
+routes.post('/profile', Profile.controllers.update)
 
 
 // Exportando a função rotas
